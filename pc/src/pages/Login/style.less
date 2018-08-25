@@ -1,0 +1,34 @@
+@import "../global.less";
+
+.root {
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  //   background: @gray;
+  background: url("../../img/loginBg.jpeg") no-repeat center center / cover;
+
+  .formContainer {
+    width: 70%;
+    margin: 50px auto;
+    padding: 5vw;
+    margin-top: 30px;
+    max-width: 500px;
+    box-sizing: border-box;
+    border-radius: 3px;
+    .logo {
+      text-align: center;
+      img {
+        width: 50%;
+      }
+    }
+    .nadmin {
+      margin: 20px auto;
+      text-align: center;
+      color: #bbb;
+    }
+    .loginBtn {
+      width: 100%;
+      display: inline-block;
+    }
+  }
+}

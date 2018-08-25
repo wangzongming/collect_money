@@ -1,0 +1,15 @@
+{
+  "apps": [{
+    "name": "bookborrow",
+    "script": "production.js",
+    "cwd": "D:\\work\\collect_money\\server",
+    "exec_mode": "fork",
+    "max_memory_restart": "1G",
+    "autorestart": true,
+    "node_args": [],
+    "args": [],
+    "env": {
+      
+    }
+  }]
+}

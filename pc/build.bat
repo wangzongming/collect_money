@@ -1,0 +1,3 @@
+@echo off
+title 打包中...
+yarn build
