@@ -25,7 +25,7 @@ module.exports = class extends Base {
     try {
       //附件表情况下查询时需要查附件表
       const params = await think.newParams(this.ctx);
-      let data = await think.select(dbTable, params, dbTableFiles, [
+      let {data, totalNumber} = await think.select(dbTable, params, dbTableFiles, [
         keyId,
         keyId
       ]);
@@ -34,7 +34,7 @@ module.exports = class extends Base {
         message: "查询成功",
         success: true,
         data: data,
-        totalNumber: data.length
+        totalNumber:totalNumber
       };
     } catch (err) {
       think.sysErr(err, this.ctx);

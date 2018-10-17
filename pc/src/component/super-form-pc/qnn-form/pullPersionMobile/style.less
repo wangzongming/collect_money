@@ -1,0 +1,288 @@
+@blue: #108ee9;
+@orange: rgb(255, 123, 0);
+@red: rgba(255, 0, 0, 0.596);
+@gray: #efeff4;
+//淡蓝色
+@bluePersionImg: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgEAYAAAAj6qa3AAADJ0lEQVRo3u1YX0hTURyWNP+WIqYRqUsjGArmHwLzXz1ICUVIzYcgAhXCP4nk1YbsnjuwF4UwZ4rNl8T97sRpD4nMMK0HbZFtbufogpjonmoSStFDSehtw90FC1nidr3Gvj18cLmcc75v5/f9zrkhIUEEEUQQAoBOHXRgKi2NrmGPkY76eiYHjmJJZyfPqBfOk+S6Ov69Ay9YybmEJCXRq+wh/FKrRb/gMh7c2kIIAGOO25H590agBVMs2/pZN2wuSkw8QMJZlpD0dKQHFSmz230K9sWnQEoSVlZEvzMa9N1ltrsREdtbeXFxz8K9+RGo8CghSk43bJWFh4uvxjs0r/ByY6PfhXsx3Qp3cHhDg+gMQB3wBRdYLAE3wA4f8JzJJKKaV6uNxujoQAv3Dsl7Bp3u7cmoKDGkfZpVlpoqmAFuVvQOvViwpaTsuwHNt1zpHBMjtAH8vOIJwS0YIjes1oAb4O4G4usCb1z9Xy4PeAhOwAlypKVFhAcgdxiOQDymlpb8bkCCk4ptNtGE347t8LD2ueV2Zia6CCb8cXV1z8LnoBZrHQ4lBypzUUbGgTkSK5ZZ6XyTRII+sfHYOjGxa+FnnbXeo9fzXUb0gisqdE6EhtJGTe5Cbnm5knvt/IWFeXZG1VCWZSMnB62zUvKYpmkjGPGTgQEP26GenFMonHcJmZnLzv5TWtvj8OPy84hGuPy+btj4Pi4O/WAv4G/T055/8AFEkbD5+d0u3NtI2gEKUmw2e8a9BDN4bGrKVRLvTsfG7ptwPoxQLeRhymDwuaWvQhZ+uLaGJJrveGNsjCmF6/hKTw/P/HPPe77Gq3LdNmdnldxTboWLjBS+7Y06a5Tq7xf6APQXN0MTye/rEy7lF8FuKS0s/OcPHALdDRS9mmsLtoKCwBtQwkpx3uTkvgv3Zne3CfylRw7rmNrcFJ0B7nW5wpGUJSf73QBmnGUwVV0tOuFezDzTDFhQZaX/DSgBTGq6u0VvQD4rw4auLv+f7Nwhw3+SYiLYWjLe1sakaGYsX9vb0U3IJsdVKoQ0P/EZtTpg7J6Hn5dfB78uwcIwiCCC+C/wG7di2vTsqe0bAAAAAElFTkSuQmCC";
+@blueFolderImg: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgEAYAAAAj6qa3AAABaElEQVRo3u3ZsUtCURTH8fsH1OBoQ6AgtLWJEAgRiG4FQjikD0GpIVIClXz3OTU0lQRha54jOAUJOTg0tYSQ95gNgeEQ4RBovCGcXks0tIb18J3f8p3vhzvdKwSPxxNCCJmEcmeSTMpXdKlesynfIaT2W63f1ljHOTqsVAoFRCKXy3YHL67iW+fM75cSQCnLmlqfIE8rjYbtAIwW3FAilZo6wFeLz7hEp8Ggfa6+RCRKp/8KQN7BjqoNh0YQFG1HIs4D+NkNMNV4NJILoKt6vz+t6h8o1Eu3Kx9gQHu5nH0A/qnFXShTOBBwLIAMVdPqKh53LIBRA42WEwkGYAAGYAAGYAAGYAAGYAAGYAAGYABHAkQxSnVNcxzAcdVUk1hMlKwLTy+6uCi3YFOBac48QB/WyDMeHwyqj+222/39Nqgf1ebvT3w+/Rw1usxm9VtEonx+ViqvoUzhTKZkIRJ5vfwVxuMJIYT4BGQM8pMyG9nLAAAAAElFTkSuQmCC";
+/*滚动条样式*/
+
+.scrollstyle {
+    &::-webkit-scrollbar {
+        /*滚动条整体样式*/
+        width: 3px;
+        /*高宽分别对应横竖滚动条的尺寸*/
+        height: 3px;
+    }
+    &::-webkit-scrollbar-thumb {
+        /*滚动条里面小方块*/
+        border-radius: 5px;
+        -webkit-box-shadow: inset 0 0 3px rgba(235, 235, 235, 0.1);
+        background: rgba(53, 53, 53, 0.4);
+    }
+    &::-webkit-scrollbar-track {
+        /*滚动条里面轨道*/
+        // -webkit-box-shadow: inset 0 0 3px rgba(0, 0, 0, 0.1);
+        border-radius: 0;
+        background: transparent; // background: rgba(0, 0, 0, 0.1);
+    }
+}
+
+.PullPersionMobile {
+    width: 100%;
+    box-sizing: border-box; // .bottomInfo {
+    .label {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        min-width: 50px;
+    }
+    .con {
+        // overflow: hidden;
+        word-wrap: break-word;
+        white-space: normal;
+        &>div {
+            display: inline-block;
+        }
+        .addBtn {
+            height: 30px;
+            padding: 3px 5px;
+            margin: 3px 5px;
+            display: inline-block;
+            color: @blue;
+            font-size: 14px;
+        }
+        .fItem {
+            height: 30px;
+            padding: 3px 5px;
+            margin: 3px 5px;
+            padding-left: 30px;
+            padding-right: 28px;
+            border: 1px solid #ccc;
+            box-shadow: 0 0 2px rgba(53, 53, 53, 0.1);
+            box-sizing: border-box;
+            border-radius: 3px;
+            display: inline-block;
+            position: relative;
+            color: rgba(53, 53, 53, 0.8);
+            font-size: 15px;
+            .fdel {
+                font-size: 25px;
+                font-weight: 100;
+                display: inline-block;
+                color: @blue;
+                position: absolute;
+                right: 5px;
+                top: -5px;
+            }
+        }
+        :global {
+            .am-list-content {
+                padding-left: 20px;
+            }
+        }
+        .per {
+            background: url(@bluePersionImg) no-repeat 3px center / 20px 20px;
+        }
+        .folder {
+            background: url(@blueFolderImg) no-repeat 3px center / 20px 20px;
+        }
+    }
+}
+
+:global {
+    .bottomInfo {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        z-index: 10;
+        background: #fff;
+        box-sizing: border-box;
+        transition: 0.3s;
+        box-shadow: 0 -1px 10px rgba(53, 53, 53, 0.1); // border-top-left-radius: 20px;
+        // border-top-right-radius: 20px;
+        transform: translateY(100%);
+    }
+    .bottomInfo .close {
+        background: #fff;
+        width: 100%;
+        color: @blue;
+        padding: 8px 0;
+        text-align: center;
+        border-bottom: 1px solid #fbfbfb;
+    }
+    .bottomInfo .content {
+        padding: 10px;
+        min-height: 50px;
+        color: #bbb;
+    }
+    .bottomInfo .content .item {
+        padding: 6px 0;
+    }
+    .bottomInfo .content .item span,
+    .bottomInfo .content .item a {
+        padding-left: 6px;
+    }
+    .am-modal-content {
+        text-align: left;
+    }
+    .myDrawer {
+        box-sizing: border-box;
+        width: 100vw; // position: fixed;
+        height: 100%;
+        overflow: hidden;
+        top: 0px;
+        bottom: 0px;
+        left: 0;
+        right: 0;
+        z-index: 999999; // border:1px solid red;
+    }
+    .navContainer {
+        display: flex;
+        flex-wrap: wrap; // position: absolute;
+        // top:3px;
+    }
+    .navContainer .navItem {
+        padding-left: 5px;
+        box-sizing: border-box;
+        color: @blue;
+        &:nth-last-child(1) {
+            color: #666;
+        }
+    }
+    .noData {
+        color: #ccc;
+        text-align: center;
+        font-size: 14px;
+        margin-top: 20px;
+    }
+    .tit {
+        color: #666;
+        font-size: 13px;
+    }
+    .myList {
+        box-sizing: border-box;
+    }
+    .myList .fItem {
+        height: 30px;
+        padding: 3px 5px;
+        margin: 3px 5px;
+        padding-left: 26px;
+        padding-right: 25px;
+        border: 1px solid #ccc;
+        box-sizing: border-box;
+        border-radius: 3px;
+        display: inline-block;
+        position: relative;
+    }
+    .per {
+        background: url(@bluePersionImg) no-repeat 3px center / 20px 20px;
+    }
+    .folder {
+        background: url(@blueFolderImg) no-repeat 3px center / 20px 20px;
+    }
+    .myList .fItem .fdel {
+        font-size: 25px;
+        font-weight: 100;
+        display: inline-block;
+        color: @blue;
+        position: absolute;
+        right: 5px;
+        top: -3px;
+    }
+    .myList .myListCon {
+        height: 65vh;
+        overflow: scroll;
+        .scrollstyle;
+        transform: translate3d(0, 0, 0);
+        -webkit-overflow-scrolling: touch;
+        box-sizing: border-box;
+    }
+    .myList .myListCon .am-list-extra {
+        order: -1;
+        flex-basis: 18px;
+        padding-right: 6px;
+    }
+    .myList .footer {
+        width: 100%;
+        height: 25vh;
+        box-sizing: border-box;
+        z-index: 10;
+        padding: 10px 0; // box-shadow: -5px 0px 10px rgba(53, 53, 53, 0.8);
+    }
+    .myList .footerCon {
+        width: 100%; // height: 100%;
+        height: 25vh;
+        text-align: left;
+        word-wrap: break-word;
+        white-space: normal;
+        box-sizing: border-box;
+        overflow-y: scroll;
+        padding: 10px 0;
+        padding-bottom: 10vh;
+        .scrollstyle;
+        transform: translate3d(0, 0, 0);
+        -webkit-overflow-scrolling: touch;
+        box-sizing: border-box;
+    }
+    .myList .footer .per {
+        background: url(@bluePersionImg) no-repeat 3px center / 20px 20px;
+    }
+    .myList .footer .folder {
+        background: url(@blueFolderImg) no-repeat 3px center / 20px 20px;
+    }
+    .treeContainer {
+        box-sizing: border-box;
+        :global {
+            .am-list {
+                .am-list-header {
+                    padding: 0;
+                    padding-bottom: 5px;
+                } //设置input的宽
+                .am-checkbox-input {
+                    width: 13%;
+                }
+            }
+        }
+    }
+    .treeContainer .myAccordion {
+        :global(.am-accordion-header) {
+            padding-left: 0;
+        }
+    }
+    .treeContainer .myActivityIndicator {
+        justify-content: center;
+        padding-top: 10px;
+    }
+    .treeContainer .navContainer {
+        display: flex;
+        flex-wrap: wrap; // position: absolute;
+        // top:3px;
+    }
+    .treeContainer .navItem {
+        padding-left: 5px;
+        box-sizing: border-box;
+        color: @blue;
+        &:nth-last-child(1) {
+            color: #666;
+        }
+    }
+    .treeContainer .treeNoData {
+        text-align: center;
+        color: #ccc;
+        padding-top: 20px;
+    }
+    .am-list-footer {
+        padding: 0;
+    }
+}
+
+@keyframes renderListAni {
+    0% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
+    }
+}

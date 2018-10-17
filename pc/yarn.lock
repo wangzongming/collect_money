@@ -7164,6 +7164,10 @@ wbuf@^1.1.0, wbuf@^1.7.2:
   dependencies:
     minimalistic-assert "^1.0.0"
 
+wcamera@^2.2.1:
+  version "2.2.1"
+  resolved "https://registry.yarnpkg.com/wcamera/-/wcamera-2.2.1.tgz#dbb1f49dd3d55a42b2c097f854ceb2e6cadc71d6"
+
 webidl-conversions@^3.0.0:
   version "3.0.1"
   resolved "https://registry.yarnpkg.com/webidl-conversions/-/webidl-conversions-3.0.1.tgz#24534275e2a7bc6be7bc86611cc16ae0a5654871"

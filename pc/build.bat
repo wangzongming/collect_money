@@ -1,3 +1,6 @@
 @echo off
-title 打包中...
+
+set PUBLIC_URL=.
 yarn build
+
+pause

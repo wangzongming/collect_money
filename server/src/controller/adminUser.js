@@ -20,13 +20,29 @@ module.exports = class extends Base {
       //参数通过验证后将走数据库存储
       //只有超级管理员可以查看所有用户列表
       //权限查询
+      const params = await think.newParams(this.ctx);
       const model = think.model("admin_user");
       const userInfo = this.ctx.state;
       let me = await model.where({ uid: userInfo.uid }).find();
       if (me.permissions === "0") {
-        const adminUserList = await model.select();
+        let { data, totalNumber } = await think.select("admin_user", params);
+        
+        data = data.map(item => {
+          item.password = think.passwordFn(item.password, "de"); 
+          item.head_img = [
+            {
+              status: "done",
+              name: "xxx.png",
+              url: think.staticUrl + item.headImg,
+              path: item.headImg,
+              uid: "0"
+            }
+          ];
+          return item;
+        });
         this.ctx.body = {
-          data: adminUserList,
+          data,
+          totalNumber,
           success: true,
           message: "查询成功"
         };
@@ -79,12 +95,7 @@ module.exports = class extends Base {
           .where({
             username,
             password
-          })
-          .join({
-            admin_user_files: {
-              on: ["id", "id"]
-            }
-          })
+          }) 
           .find();
 
         think.createToken(userToken).then(token => {
@@ -126,12 +137,10 @@ module.exports = class extends Base {
         //删除表单数据and附件表
         const userInfo = this.ctx.state;
 
-        const model = think.model("admin_user");
-        const imagesModel = think.model("admin_user_files");
+        const model = think.model("admin_user"); 
         //权限查询
         let me = await model.where({ uid: userInfo.uid }).find();
-        if (me.permissions === "0") {
-          await imagesModel.where({ uid }).delete();
+        if (me.permissions === "0") { 
           await model.where({ uid }).delete();
           this.ctx.body = {
             success: true,
@@ -167,13 +176,7 @@ module.exports = class extends Base {
           verification, //验证码
           phone,
           //模拟附件参数
-          images = [
-            {
-              uid: "0",
-              url:
-                "https://images.pexels.com/photos/936102/pexels-photo-936102.jpeg?auto=compress&cs=tinysrgb&h=350"
-            }
-          ]
+          head_img = []
         } = params;
         //将密码加密处理
         password = think.passwordFn(password, "en");
@@ -195,6 +198,7 @@ module.exports = class extends Base {
             password,
             permissions, //权限
             phone,
+            head_img: head_img[0] ? head_img[0].path : "",
             uid
           });
         if (type === "exist") {
@@ -202,20 +206,7 @@ module.exports = class extends Base {
             success: false,
             message: "该账号名或者手机号已被使用"
           };
-        } else {
-          if (!think.isEmpty(images)) {
-            //往附件表插数据
-            //附件需要存入附件表admin_user_files
-            const obj = {
-              uid,
-              id,
-              url: images[0].url
-            };
-            const imgModel = think.model("admin_user_files");
-            let img = await imgModel.add({
-              ...obj
-            });
-          }
+        } else { 
 
           this.ctx.body = {
             success: true,
@@ -241,13 +232,7 @@ module.exports = class extends Base {
           phone,
           uid, //必传
           //模拟附件参数
-          images = [
-            {
-              uid: "0",
-              url:
-                "https://images.pexels.com/photos/936102/pexels-photo-936102.jpeg?auto=compress&cs=tinysrgb&h=350"
-            }
-          ]
+          head_img = []
         } = params;
         //将密码加密处理
         password = think.passwordFn(password, "en");
@@ -261,20 +246,9 @@ module.exports = class extends Base {
           // username,
           password,
           permissions, //权限
-          phone
-        });
-        //附件存在将更新附件
-        if (!think.isEmpty(images)) {
-          //往附件表插数据
-          //附件需要存入附件表admin_user_files
-          const obj = {
-            url: images[0].url
-          };
-          const imgModel = think.model("admin_user_files");
-          let img = await imgModel.where({ uid }).update({
-            ...obj
-          });
-        }
+          phone,
+          head_img: head_img[0] ? head_img[0].path : "",
+        }); 
 
         this.ctx.body = {
           success: true,

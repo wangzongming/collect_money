@@ -12,6 +12,7 @@
     "lint-fix": "eslint --fix src/"
   },
   "dependencies": {
+    "baidu-aip-sdk": "^2.3.3",
     "jsonwebtoken": "^8.3.0",
     "koa-jwt": "^3.3.2",
     "koa-unless": "^1.0.7",

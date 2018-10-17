@@ -1,15 +1,22 @@
 /*
 设置token和验证token的扩展
+log 2018.10.14:
+  更新方法增加messgae参数 
+  查询方法新增isLike参数 默认true //是否使用like检索
+  查询方法返回一个对象 {data,toralNumber}
+  小程序登录开发中
 */
 import jwt from "jsonwebtoken";
 import crypto from "crypto";
 import uuidv1 from "uuid/v1";
+import { batchDel, wxLogin } from "../func";
+const isDev = think.env === "development";
 
 const verify = think.promisify(jwt.verify); // 解密
 
 module.exports = {
-  secretKey: "oldWang_bookborrow_project", //全局密匙
-  staticUrl:'https://mnetwork.xyz/',//nginx静态服务地址
+  secretKey: "oldWang_collect_project", //全局密匙 
+  staticUrl: isDev ? "https://mnetwork.xyz:8080/" : "https://www.liningyuan.com/", //nginx静态服务地址
   //创建uid
   createUid: () => {
     //根据时间戳创建32位uid
@@ -87,7 +94,7 @@ module.exports = {
             if (params.hasOwnProperty(key)) {
               const element = params[key];
               //属性值为空是否也将保留
-              if (element || element===0 || element==='0') {
+              if (element || element === 0 || element === "0") {
                 _params[this.snakeCase(key)] = element;
               } else {
                 if (nullKey) {
@@ -145,7 +152,7 @@ module.exports = {
         for (const key in params) {
           if (params.hasOwnProperty(key)) {
             const element = params[key];
-            if (element || element===0 || element==='0') {
+            if (element || element === 0 || element === "0") {
               _params[this.camelCase(key)] = element;
             } else {
               if (nullKey) {
@@ -327,7 +334,13 @@ module.exports = {
     //传入ctx对象  paramsFormat方法的配置
     if (!rules) {
       //无需验证
-      return await this.paramsFormat(ctx.post());
+      let params = ctx.post();
+      if (think.isArray(params) || think.isEmpty(params)) {
+        //数组直接返回
+        return params;
+      }
+      params.success = true;
+      return await this.paramsFormat(params);
     } else {
       //验证
       let params = ctx.post();
@@ -409,7 +422,7 @@ module.exports = {
     }
     return res;
   },
-  updateRes: data => {
+  updateRes: (data, message = "修改成功") => {
     let res = {};
     if (data === 0) {
       res = {
@@ -418,7 +431,7 @@ module.exports = {
       };
     } else {
       res = {
-        message: "修改成功",
+        message,
         success: true
       };
     }
@@ -427,11 +440,45 @@ module.exports = {
 
   //一些共通查询
   //根据传入的数据查每条数据的附件表 暂无好的优化处理
-  async select(dbTable, where = {}, dbTableFiles, key = ["id", "id"], fieldName='images', sort={}) {
+  async select(
+    dbTable,
+    where = {},
+    dbTableFiles,
+    key = ["id", "id"],
+    fieldName = "images",
+    sort = {},
+    isLike = true //是否使用like检索
+  ) {
     //传入 主表名 主表条件 附件表名 需要查询的主键 附件字段名称 排序 功能：实现类似于sql全联查询
-    return new Promise((resolve, reject) => {
+    return new Promise(async (resolve, reject) => {
+      //将分页数据删除
+      let page = 0;
+      let pagesize = 999999999;
+      if (where.success) {
+        delete where.success;
+      }
+      if (where.page) {
+        page = where.page;
+        delete where.page;
+      }
+      if (where.limit) {
+        pagesize = where.limit;
+        delete where.limit;
+      }
       const model = think.model(dbTable);
+
+      //需要去查总数
+      let totalNumber = await model.count("*");
+
+      //将where所有添加变为like检索
+      if (isLike && !think.isEmpty(where)) {
+        for (const key in where) {
+          const e = where[key];
+          where[key] = ['like', `%${e}%`]
+        }
+      }
       data = model
+        .page(page, pagesize)
         .where({ ...where })
         .order(sort)
         .select()
@@ -439,36 +486,186 @@ module.exports = {
           if (dbTableFiles) {
             //查询附件表
             const modelF = think.model(dbTableFiles);
-            modelF.select().then(fdata => {//附件表数据
+            modelF.select().then(fdata => {
+              //附件表数据
               data = data.map((item, i) => {
-                let id1 = item[key[0]];//主表主键 
+                let id1 = item[key[0]]; //主表主键
                 let files = [];
-                for(let j=0;j<fdata.length;j++){
-                  let id2 = fdata[j][key[1]];//附件表主键
-                  if(id1 === id2){
+                for (let j = 0; j < fdata.length; j++) {
+                  let id2 = fdata[j][key[1]]; //附件表主键
+                  if (id1 === id2) {
                     fdata[j].url = `${this.staticUrl}${fdata[j].path}`;
                     fdata[j].path = fdata[j].path;
                     fdata[j].uid = j;
-                    fdata[j] = think._paramsFormat(fdata[j], "__", true); 
+                    fdata[j] = think._paramsFormat(fdata[j], "__", true);
                     files.push(fdata[j]);
                   }
-                } 
+                }
                 item = think._paramsFormat(item, "__", true);
-                item[fieldName] = files;//赋值到附件字段上
+                item[fieldName] = files; //赋值到附件字段上
                 return item;
               });
-              resolve(data);
-              return data;
+
+              let _res = { data, totalNumber };
+              //如果带条件查询将不能返回全部数据
+              if (!think.isEmpty(where)) {
+                _res.totalNumber = data.length;
+              }
+              resolve(_res);
+              return _res;
             });
           } else {
             data = data.map((item, i) => {
               item = think._paramsFormat(item, "__", true);
               return item;
             });
-            resolve(data);
-            return data;
+            let _res = { data, totalNumber };
+            //如果带条件查询将不能返回全部数据
+            if (!think.isEmpty(where)) {
+              _res.totalNumber = data.length;
+            }
+            resolve(_res);
+            return _res;
           }
         });
     });
+  },
+
+  //获取附件表数据
+  async getTableFiles(data, tableConfig = {}, filesConfig = {}) {
+    /*
+      主表配置需要传入  从表字段名  
+      从表配置需要传入  从表表名  关系主键  从表附件表表明 附件表名
+    */
+    const { childrenKey } = tableConfig;
+    const { key, tableName } = childrenConfig;
+  },
+  //获取从表数据
+  async getTableChildren(
+    tableData = [],
+    tableConfig = {},
+    childrenConfig = {}
+  ) {
+    //主表数据 主表配置 从表配置
+    /*
+      主表配置需要传入  从表字段名  
+      从表配置需要传入  从表表名  关系主键  从表附件表表明 附件表名
+    */
+    const { childrenKey } = tableConfig;
+    const {
+      key, //主键
+      tableName, //从表表名
+      relationTableChildrenFilesField, //从表的附件表附件字段名
+      relationTableChildrenFilesKey, //从表的附件表的主键
+      relationTableChildrenFilesTableName, //从表的附件表
+      relationTableChildrenFilesFieldId //从表的附件表字段名(关联的字段)
+    } = childrenConfig;
+    return new Promise(resolve => {
+      const model = think.model(tableName);
+      for (let i = 0; i < tableData.length; i++) {
+        let _children = tableData[i][childrenKey];
+        if (_children) {
+          model
+            .where({ [key]: ["IN", _children] })
+            .select()
+            .then(data => {
+              //查出来所有从表数据
+              if (data.length > 0) {
+                tableData[i][childrenKey] = data;
+              }
+              //继续查从表的附件表数据
+              if (
+                relationTableChildrenFilesField &&
+                relationTableChildrenFilesField
+              ) {
+                const modelF = think.model(relationTableChildrenFilesTableName);
+                for (let k = 0; k < data.length; k++) {
+                  let _children = data[k][relationTableChildrenFilesFieldId];
+                  if (_children) {
+                    modelF
+                      .where({
+                        [relationTableChildrenFilesKey]: ["IN", _children]
+                      })
+                      .select()
+                      .then(_data => {
+                        data[k][relationTableChildrenFilesField] = _data;
+                        tableData[i][childrenKey] = data;
+                        if (i === tableData.length - 1) {
+                          resolve(tableData);
+                        }
+                      });
+                  } else {
+                    if (i === tableData.length - 1) {
+                      resolve(tableData);
+                    }
+                  }
+                }
+              } else {
+                if (i === tableData.length - 1) {
+                  resolve(tableData);
+                }
+              }
+            });
+        } else {
+          if (i === tableData.length - 1) {
+            resolve(tableData);
+          }
+        }
+      }
+    });
+  },
+  //获取setting的数据
+  async getConfig(name) {
+    const settingModel = think.model("admin_setting");
+    let data = await settingModel.select();
+    let _data = data[0][name];
+    return _data;
+  },
+  //获取用户信息
+  async getUserInfo(id, ctx) {
+    return new Promise(async resolve => {
+      const model = think.model("user");
+      const data = await model.where({ id }).find();
+      if (data.id) {
+        resolve(data);
+      } else {
+        resolve(false);
+      }
+    });
+  },
+  //设置用户信息
+  async setUserInfo(id, params, ctx) {
+    return new Promise(resolve => {
+      const model = think.model("user");
+      model
+        .where({ id })
+        .find()
+        .then(data => {
+          if (data.id) {
+            const data = model
+              .where({ id })
+              .update({
+                ...params
+              })
+              .then(data => {
+                resolve(data);
+              });
+          } else {
+            ctx.body = {
+              message: "未查询到您的账号。如有疑问请联系管理员",
+              success: false
+            };
+          }
+        });
+    });
+  },
+  //删除方法 批量删或者 单个删除
+  async batchDel({ ctx, tableName, delData, key, dbTableFiles = {} }) {
+    //dbTableFiles{attacKey, attacTableNmam}
+    await batchDel({ ctx, tableName, delData, key, dbTableFiles });
+  },
+  //微信登录
+  async wxLogin(params = {}) {
+    await wxLogin({ ...params });
   }
 };

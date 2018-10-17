@@ -1,6 +1,7 @@
 import React, { Component } from "react";
-import SuperForm from "../../component/super-form-pc";
-import { message as Msg } from "antd";
+// import SuperForm from "../../component/super-form-pc";
+import QnnForm from "../../component/super-form-pc";
+import { message as Msg, Form } from "antd";
 
 class index extends Component {
   state = {
@@ -45,14 +46,14 @@ class index extends Component {
                   type: "string",
                   label: "菜名",
                   message: "必填",
-                  must: true
+                  required: true
                 },
                 {
                   field: "price",
                   type: "number",
                   label: "价格",
                   message: "必填",
-                  must: true
+                  required: true
                 },
                 {
                   field: "show",
@@ -70,15 +71,15 @@ class index extends Component {
                       value: "1"
                     }
                   ],
-                  must: true
+                  required: true
                 },
                 {
                   field: "soldOut",
                   type: "number",
                   label: "已售份数",
                   message: "必填",
-                  must: true,
-                  initialValue: '0'
+                  required: true,
+                  initialValue: "0"
                 },
                 {
                   field: "classify",
@@ -86,7 +87,7 @@ class index extends Component {
                   label: "分类",
                   message: "必填",
                   selectOptionData: data,
-                  must: true
+                  required: true
                 },
                 {
                   field: "sort",
@@ -94,7 +95,7 @@ class index extends Component {
                   label: "排序",
                   initialValue: 1000,
                   message: "必填",
-                  must: true,
+                  required: true,
                   help: "越小越往前排"
                 },
                 {
@@ -102,7 +103,7 @@ class index extends Component {
                   type: "images",
                   label: "图片",
                   message: "必填",
-                  must: true,
+                  required: true,
                   url: window.globalConfig.apiUrl + "upload",
                   token: this.props.userInfo.token,
                   name: "menu"
@@ -154,14 +155,14 @@ class index extends Component {
                   type: "string",
                   label: "菜名",
                   message: "必填",
-                  must: true
+                  required: true
                 },
                 {
                   field: "price",
                   type: "number",
                   label: "价格",
                   message: "必填",
-                  must: true
+                  required: true
                 },
                 {
                   field: "show",
@@ -179,15 +180,15 @@ class index extends Component {
                       value: "1"
                     }
                   ],
-                  must: true
+                  required: true
                 },
                 {
                   field: "soldOut",
                   type: "number",
                   label: "已售份数",
                   message: "必填",
-                  must: true,
-                  initialValue: '0'
+                  required: true,
+                  initialValue: "0"
                 },
                 {
                   field: "classify",
@@ -195,7 +196,7 @@ class index extends Component {
                   label: "分类",
                   message: "必填",
                   selectOptionData: data,
-                  must: true
+                  required: true
                 },
                 {
                   field: "sort",
@@ -203,7 +204,7 @@ class index extends Component {
                   label: "排序",
                   initialValue: 1000,
                   message: "必填",
-                  must: true,
+                  required: true,
                   help: "越小越往前排"
                 },
                 {
@@ -211,7 +212,7 @@ class index extends Component {
                   type: "images",
                   label: "图片",
                   message: "必填",
-                  must: true,
+                  required: true,
                   url: window.globalConfig.apiUrl + "upload",
                   token: this.props.userInfo.token,
                   name: "menu"
@@ -259,19 +260,24 @@ class index extends Component {
 
   render() {
     const { config } = this.state;
+    console.log(config)
     return (
       <div>
         {config ? (
-          <SuperForm
-            ref="SuperForm"
-            config={config}
-            myFetch={this.props.myAxios}
-            help
+          <QnnForm 
+            // ref="SuperForm"
+            // formConfig={config}
+            {...config}
+            fetch={this.props.myAxios}
+            headers={{ token: this.props.userInfo.token }}
+            history={this.props.history}
+            match={this.props.match}
+            form={this.props.form}
           />
         ) : null}
       </div>
     );
   }
 }
-
-export default index;
+const rForm = Form.create()(index);
+export default rForm;

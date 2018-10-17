@@ -21,22 +21,22 @@ export const add = [
 
 export const update = [
   {
-    field: "menuId",
+    field: "id",
     rules: [
       {
         require: true,
-        message: "menuId必传"
+        message: "id必传"
       }
     ]
-  } 
+  }
 ];
 export const del = [
   {
-    field: "menuId",
+    field: "id",
     rules: [
       {
         require: true,
-        message: "menuId必传"
+        message: "id必传"
       }
     ]
   }

@@ -12,22 +12,22 @@ export const add = [
 
 export const update = [ 
   {
-    field: "uid",
+    field: "id",
     rules: [
       {
         require: true,
-        message: "uid必传"
+        message: "id必传"
       }
     ]
   }
 ];
 export const del = [
   {
-    field: "uid",
+    field: "id",
     rules: [
       {
         require: true,
-        message: "uid必传"
+        message: "id必传"
       }
     ]
   }

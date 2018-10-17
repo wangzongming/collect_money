@@ -2,28 +2,29 @@
 import { incMenu } from "../layout";
 //页面
 import {
-  MenuAdd,
+  // MenuAdd,
+  // UserAdd,
   MenuList,
   UserList,
-  UserAdd,
   ClassifyManage,
   Test,
-  OrderList
+  OrderList,
+  Menu
 } from "../pages";
 
 const routeData = [
-  {
-    componentKey: "menuAdd",
-    component: incMenu(MenuAdd)
-  },
+  // {
+  //   componentKey: "menuAdd",
+  //   component: incMenu(MenuAdd)
+  // },
   {
     componentKey: "menuList",
     component: incMenu(MenuList)
   },
-  {
-    componentKey: "userAdd",
-    component: incMenu(UserAdd)
-  },
+  // {
+  //   componentKey: "userAdd",
+  //   component: incMenu(UserAdd)
+  // },
   {
     componentKey: "userList",
     component: incMenu(UserList)
@@ -39,6 +40,10 @@ const routeData = [
   {
     componentKey: "orderList",
     component: incMenu(OrderList)
+  },
+  {
+    componentKey: "menu",
+    component: incMenu(Menu)
   }
 ];
 

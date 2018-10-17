@@ -1,0 +1,185 @@
+//灰色
+// @persionImg: "data:image/png;base64,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";
+// @folderImg: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgEAYAAAAj6qa3AAAABGdBTUEAALGPC/xhBQAAAAFzUkdCAK7OHOkAAAAgY0hSTQAAeiYAAICEAAD6AAAAgOgAAHUwAADqYAAAOpgAABdwnLpRPAAAAAZiS0dEAAAAAAAA+UO7fwAAAAlwSFlzAAAASAAAAEgARslrPgAAAbdJREFUaN7tmaFrAlEcx7/vqSuWawNXDG7YrhmXJsdww7Qqct1iECYmwfAe9y8s6IFh8cLiOBbsgmC6VZNzgzGYqL8Fdy6sbDj3C75POu7gfp/fB67cAwyGvUbEF7qu67ruukgjjfTVFQYYYJBMbj1hjDHGUbSsLWvL2vUnsxn34jFJ1VRN1SwUYMGCdXOzeeLAgfMHExw4cM7OEnbCTthHR+ubl5fci8dIOZVTObXtnU8aYojhxYXneq7nnp5yL74JQD3qUU+I7V/1M6hPferf3npFr+gVz8+5A2z/jf82QJva1D48JBAId3d6oid68vwsRmIkRk9PO5tbpjKV396goKB8v5Fv5Bt5rf89wDcqqKBiWesglrXzeQECBEqpnMqp3MOD5N6fCxGKUIQnJ3sbgBQpUkLsbYAYE4BbgBsTgFuAGxOAW4AbE4BbgBsTgFuAGxOAW4AbE4BbgBuJLrrozufcIv+N8IUv/PlcrqJVtIru70VHdETn9ZVbbOdkkUX25SVVSpVSpTD8Ohip6qquHh/Hv6+pRS1qHRxw+/4VMpShDN/fF5lFZpEJgvUBzeMjt5fBwMwHBSiVyXeWUYEAAAAldEVYdGRhdGU6Y3JlYXRlADIwMTgtMDQtMjNUMTA6Mjk6MTkrMDg6MDByVk7HAAAAJXRFWHRkYXRlOm1vZGlmeQAyMDE4LTA0LTIzVDEwOjI5OjE5KzA4OjAwAwv2ewAAAGN0RVh0c3ZnOmJhc2UtdXJpAGZpbGU6Ly8vaG9tZS9hZG1pbi9pY29uLWZvbnQvdG1wL2ljb25fZHlnaXo0OWVwZndhc2pvci8lRTYlOTYlODclRTQlQkIlQjYlRTUlQTQlQjkuc3Znt4z+9wAAAABJRU5ErkJggg==";
+ 
+//淡蓝色
+@bluePersionImg: "data:image/png;base64,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";
+@blueFolderImg: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgEAYAAAAj6qa3AAAABGdBTUEAALGPC/xhBQAAAAFzUkdCAK7OHOkAAAAgY0hSTQAAeiYAAICEAAD6AAAAgOgAAHUwAADqYAAAOpgAABdwnLpRPAAAAAZiS0dEAAAAAAAA+UO7fwAAAAlwSFlzAAAASAAAAEgARslrPgAAAdVJREFUaN7tmDFIG2EYht/vj7iUgjQFxxaKQTCeUwVJSXFwCCSgiFNSlAxBXAst1l6p6JDERRGELDokcdBBUBFdRIQWIoiaQ6TQBKFQKKSaUBFytf06JbOSxm/I/0w33ft8D9xygEbT0FDlwQyn5o7L4TCm6SN9HRrCA36OxaammgeG6TM9yuXsdiQQGB+PRoNBw7i8lD686jfRmy4cL3R3qxe8TZ5Mpm5Lr2DR2ObmlCsUMz4FAtKHV1COd2ypTFdX3ZeS6OQFv38in27Pznu90odXA/A+fcdrotpfdcvBAveyc2Xlgzd1kh31+aQD1PyN35kNeNDR2sovYXHH1pbpTP06iRaLyCCGnYuLes1yjqbhub6mHJ/TTDI55Q49NebicTLNdDqbjUQAZuZE4t6DCPG3iJ/0tqdHSYtIob7wKY+5XA0bgEbIJpOoYQNU0AGkBaTRAaQFpNEBpAWk0QGkBaTRAaQFpNEBpAWk0QGkBaRROMMazmxbWuTe+cHzfGDbSq3+OXSs7u7iHBuwrq6kverOCJaov1S6GcC339beXvVv8PvY8sOj2bY2tPCg44nfDzf68Ky5Wdr3f0ElLuBNuax89Bjx9fVJCgYNI5+X9tJohPkHxW+Ttq1PDJwAAAAldEVYdGRhdGU6Y3JlYXRlADIwMTgtMDQtMjRUMTg6NTI6NTYrMDg6MDB2dfW4AAAAJXRFWHRkYXRlOm1vZGlmeQAyMDE4LTA0LTI0VDE4OjUyOjU2KzA4OjAwByhNBAAAAGN0RVh0c3ZnOmJhc2UtdXJpAGZpbGU6Ly8vaG9tZS9hZG1pbi9pY29uLWZvbnQvdG1wL2ljb25fcDVqd3EzaHQzM2hycnVkaS8lRTYlOTYlODclRTQlQkIlQjYlRTUlQTQlQjkuc3Znip7UMAAAAABJRU5ErkJggg==";
+@persionImg:@bluePersionImg;
+@folderImg: @blueFolderImg;
+.PullPersion {
+  display: flex;
+
+  //label
+  .label {
+    padding-right: 10px;
+  }
+
+  //装载人或者部门的style
+  .valueCon {
+    // border:1px solid #ccc;
+    flex: 1;
+    .colCon {
+      width: 100%;
+      position: relative;
+      border: 1px solid #ccc;
+      border-radius: 3px;
+      margin: 4px 0;
+      box-sizing: border-box;
+      padding: 0 5px;
+      height: 35px;
+      line-height: 35px;
+      font-size: 12px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      padding-right: 12px;
+      padding-left: 26px;
+      transition: 0.2s;
+      &:hover {
+        cursor: pointer;
+        border-color: #0099ff;
+        transition: 0.2s;
+      }
+      .del {
+        position: absolute;
+        right: 3px;
+        top: -9px;
+        font-size: 22px;
+        font-weight: 100;
+        transition: 0.2s;
+        &:hover {
+          transition: 0.2s;
+          cursor: pointer;
+          color: orangered;
+        }
+      }
+    }
+    .persion {
+      background: url(@bluePersionImg) no-repeat left center / 25px;
+    }
+    .folder {
+      background: url(@blueFolderImg) no-repeat 3px center / 20px;
+    }
+
+    .addBtn {
+      color: #0099ff;
+      font-size: 14px;
+      &:hover {
+        cursor: pointer;
+      }
+    }
+    .btnContainer {
+      .myBtn {
+        margin-right: 10px;
+        box-sizing: border-box;
+        height: 29px;
+      }
+    }
+  }
+}
+
+/*滚动条样式*/
+.scrollstyle {
+  &::-webkit-scrollbar {
+    /*滚动条整体样式*/
+    width: 3px; /*高宽分别对应横竖滚动条的尺寸*/
+    height: 3px;
+  }
+  &::-webkit-scrollbar-thumb {
+    /*滚动条里面小方块*/ 
+    border-radius: 5px;
+    -webkit-box-shadow: inset 0 0 3px rgba(0, 0, 0, 0.1);
+    background: rgba(0, 0, 0, 0.2);
+  }
+  &::-webkit-scrollbar-track {
+    /*滚动条里面轨道*/
+    // -webkit-box-shadow: inset 0 0 3px rgba(0, 0, 0, 0.1);
+    border-radius: 0;
+    background: transparent;
+    // background: rgba(0, 0, 0, 0.1);
+  }
+}
+
+// 弹出层白块的style
+:global(.modalBody) {
+  box-sizing: border-box;
+  display: flex;
+  align-items: stretch; 
+  height: 350px; 
+  .treeContainer {
+    box-sizing: border-box;
+    overflow-y: scroll;
+    .scrollstyle;
+    border-right: 1px solid rgba(204, 204, 204, 0.6);
+    height: 100%;
+    flex-basis: 60%;
+    padding-right: 10px;
+    box-sizing: border-box;
+  }
+  .selectedContainer {
+    padding-left: 10px;
+    box-sizing: border-box;
+    overflow-y: scroll;
+    .scrollstyle;
+    flex-basis: 40%;
+    height: 100%;
+    .selectList {
+      padding-left: 26px;
+      padding-bottom: 3px;
+    }
+    .persion {
+      // background: url(@persionImg) no-repeat left center / 18px;
+      background: url(@bluePersionImg) no-repeat left center / 18px;
+    }
+    .folder {
+      // background: url(@folderImg) no-repeat 3px center / 14px;
+      background: url(@blueFolderImg) no-repeat 3px center / 14px;
+    }
+    .selectedListDel {
+      font-size: 23px;
+      padding-right: 5px;
+      cursor: pointer;
+      &:hover {
+        color: red;
+      }
+    }
+    .selectedContainerTitle {
+      color: #999;
+    }
+  }
+}
+
+:global(.ant-tree-iconEle) {
+  background: url(@folderImg) no-repeat left center / 14px;
+}
+:global(.myNode) {
+  .checkedGou {
+    color: #ccc;
+    padding-left: 8px;
+    font-size: 18px;
+    box-sizing: border-box;
+  }
+}
+
+:global(.perNode) {
+  :global(.ant-tree-iconEle) {
+    background: url(@persionImg) no-repeat left center / 18px;
+  }
+  .checkedGou {
+    color: #ccc;
+    padding-left: 8px;
+    font-size: 18px;
+    box-sizing: border-box;
+  }
+}
+:global(.blueImg) {
+  :global(.ant-tree-iconEle) {
+    background: url(@blueFolderImg) no-repeat left center / 18px;
+  }
+}
+:global(.perNode.blueImg) {
+  :global(.ant-tree-iconEle) {
+    background: url(@bluePersionImg) no-repeat left center / 18px;
+  }
+}

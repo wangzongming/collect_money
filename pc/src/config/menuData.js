@@ -30,13 +30,18 @@ export default {
           componentKey: "menuAdd",
           mustLogin:true, //默认true
           hide:true  //不显示到菜单 默认false
-        },
-        {
-          label: "加新菜",
-          route: "/menu/add",
-          componentKey: "menuAdd",
+        },{
+          label: "菜单管理",
+          route: "/menu/manage",
+          componentKey: "menu",
           mustLogin:true, //默认true
         }
+        // {
+        //   label: "加新菜",
+        //   route: "/menu/add",
+        //   componentKey: "menuAdd",
+        //   mustLogin:true, //默认true
+        // }
       ]
     },
     {
@@ -45,7 +50,7 @@ export default {
       route: "/order", 
       children: [
         {
-          label: "分类管理", 
+          label: "全部订单", 
           route: "/order/orderList",
           componentKey: "orderList",  
         }
@@ -60,11 +65,11 @@ export default {
           route: "/user/list",
           componentKey: "userList", 
         },
-        {
-          label: "新增会员",
-          route: "/user/add",
-          componentKey: "userAdd", 
-        },
+        // {
+        //   label: "新增会员",
+        //   route: "/user/add",
+        //   componentKey: "userAdd", 
+        // },
         {
           label: "编辑会员",
           route: "/user/edit/:uid",
@@ -85,11 +90,11 @@ export default {
         }
       ]
     }, 
-    {
-      icon:'form',
-      label: "测试页面",
-      route: "/test",
-      componentKey: "test"
-    }
+    // {
+    //   icon:'form',
+    //   label: "测试页面",
+    //   route: "/test",
+    //   componentKey: "test"
+    // }
   ]
 };

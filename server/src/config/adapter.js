@@ -42,7 +42,8 @@ exports.model = {
     host: 'localhost',
     port: '3306',
     user: 'root',
-    password: '123456',
+    password:  isDev? '123456' : 'wzm514114',
+    // password: '123456',
     dateStrings: true
   }
 };

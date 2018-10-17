@@ -1,70 +1,46 @@
 import React, { Component } from "react";
-import { Upload, Icon, message } from "antd";
-
-const Dragger = Upload.Dragger;
+import { Button } from "antd"; // Upload, Icon, message
+import "wcamera/model/tracking.js";
+import "wcamera/model/data/face.js";
+import "wcamera";
 
 class Index extends Component {
   componentDidMount() {
-    console.log("props:", this.props);
+    // this.myCamera = new window.Camera({
+    //   el: "webcam", //元素必须为id名
+    //   width: window.innerHeight / 2 + 100,
+    //   height: window.innerHeight / 2 + 100,
+    //   audio: false, //是否开启声音  [booblean] 默认false  开启后无声卡会报错
+    //   video: true, //是否开启声音  [booblean] 默认true
+
+    //   //开启人脸后必须引入 tracking.js  tracker所配置的对应的js文件（所有需要的js都放置在model/data下）
+    //   linColor: "#1890ff", //线条的颜色
+    //   tracking: true, //是否开启跟踪，不开启将使用简洁版，
+    //   tracker: "face" // 需要引入 face.js mouth.js eye.js r
+    //   //不识别这些部位就可不引入需要别的办成数组即可 eg、['face', 'mouth', 'eye']
+    //   // rect:(event)=>{} //这里面是捕捉到的区域数据
+    // });
   }
-
   render() {
-    const { token } = this.props.userInfo;
-    //图书导入
-    // const props = {
-    //   name: "excel",
-    //   multiple: false, //暂不支持多选上传
-    //   action: "https://mnetwork.xyz:8080/importBookExcel",
-    //   accept: ".xls",
-    //   headers: { token },
-    //   onChange(info) {
-    //     const status = info.file.status;
-    //     if (status !== "uploading") {
-    //       console.log(info.file, info.fileList);
-    //     }
-    //     if (status === "done") {
-    //       message.success(`${info.file.name} file uploaded successfully.`);
-    //     } else if (status === "error") {
-    //       message.error(`${info.file.name} file upload failed.`);
-    //     }
-    //   }
-    // };
-
-    //附件上传
-    const props = {
-      name: "book",//后台定
-      multiple: true,  
-      action: "https://mnetwork.xyz:8080/upload",
-      // accept: ".xls",
-      headers: { token },
-      onChange(info) {
-        const status = info.file.status;
-        if (status !== "uploading") {
-          console.log(info.file, info.fileList);
-        }
-        if (status === "done") {
-          message.success(`${info.file.name} file uploaded successfully.`);
-        } else if (status === "error") {
-          message.error(`${info.file.name} file upload failed.`);
-        }
-      }
-    };
+    // const { token } = this.props.userInfo;
 
     return (
       <div>
-        <Dragger {...props}>
-          <p className="ant-upload-drag-icon">
-            <Icon type="inbox" />
-          </p>
-          <p className="ant-upload-text">
-            Click or drag file to this area to upload
-          </p>
-          <p className="ant-upload-hint">
-            Support for a single or bulk upload. Strictly prohibit from
-            uploading company data or other band files
-          </p>
-        </Dragger>
-        ,
+        <div id="webcam" style={{ position: "relative" }} />
+        <br />
+        <center>
+          <Button
+            onClick={() => { 
+              this.myCamera.save(base64 => {
+                //返回一个回调函数回调参数是base64 获取不到相片也会执行，只是数据为'获取图像失败'
+                console.log(base64);
+              });
+              // this.props.myFetch('faceApprove')
+            }}
+          >
+            认证
+          </Button>
+        </center>
       </div>
     );
   }

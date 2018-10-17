@@ -1,10 +1,12 @@
 import { add, update, del } from "../rules/user";
+import table from "../func/table";
 const Base = require("./base.js");
 //数据库配置
 const dbTable = "user"; //数据表名
 const dbTableFiles = "user_files"; //主表数据表名
-const keyId = "uid"; //主键id
+const keyId = "id"; //主键id
 const filesField = "images"; //主键id
+
 module.exports = class extends Base {
   __before() {
     // 通过 Promise.resolve 将返回值包装为 Promise
@@ -16,118 +18,64 @@ module.exports = class extends Base {
       // 其他逻辑代码
     });
   }
-  async listAction() {
-    try {
-      //附件表情况下查询时需要查附件表
-      const params = await think.newParams(this.ctx);
-      let data = await think.select(dbTable, params, dbTableFiles, [
-        keyId,
-        keyId
-      ]);
-
-      this.ctx.body = {
-        message: "查询成功",
-        success: true,
-        data: data,
-        totalNumber: data.length
-      };
-    } catch (err) {
-      think.sysErr(err, this.ctx);
-    }
-  }
-  async delAction() {
-    try {
-      const params = await think.newParams(this.ctx, del);
-      if (params.success) {
-        delete params.success;
-        if (dbTableFiles) {
-          //附件表存需要删除附件
-          const modelf = think.model(dbTableFiles);
-          const dataf = await modelf.where({ [keyId]: params[keyId] }).delete();
-        }
-        const model = think.model(dbTable);
-        const data = await model.where({ ...params }).delete();
-        this.ctx.body = think.delRes(data);
-      }
-    } catch (err) {
-      think.sysErr(err, this.ctx);
-    }
-  }
   async addAction() {
-    try {
-      const params = await think.newParams(this.ctx, add);
-      if (params.success) {
-        delete params.success;
-        //生成id
-        const id = think.createUid();
-        params.uid = id;
-        params.create_user = this.ctx.state.username;
-
-        //有附件的话将附件存起来
-        if (
-          dbTableFiles &&
-          params[filesField] &&
-          think.isArray(params[filesField])
-        ) {
-          //附件表存需要插入附件
-          params[filesField] = params[filesField].map(item => {
-            //设置主键
-            item[keyId] = params[keyId];
-            return item;
-          });
-
-          const modelf = think.model(dbTableFiles);
-          await modelf.addMany(params[filesField]);
-        }
-
-        const model = think.model(dbTable);
-        const data = await model.thenAdd(
-          {
-            ...params
-          },
-          {
-            uid: params.uid
-          }
-        );
-        this.ctx.body = think.addRes(data, params);
-      }
-    } catch (err) {
-      think.sysErr(err, this.ctx);
-    }
+    await table.add({
+      rules: add,
+      ctx: this.ctx,
+      keyId,
+      dbTable,
+      dbTableFiles,
+      filesField,
+      onlyKey: "", //: "classify_name",
+      otherParams: ["create_time", "create_user"], //: ["create_time"]
+      // paramsHand: data => {
+      //   //加上主键id
+      //   if(keyId){ 
+      //     return (data[keyId] = think.createUid());
+      //   }
+      //   return data;
+      // }
+    });
   }
+
+  async delAction() {
+    await table.del({
+      ctx: this.ctx,
+      rules: del, //数据操作规则
+      dbTable, //表 *必传
+      keyId, //主键id     ps：非驼峰
+      filesField,
+      dbTableFiles: dbTableFiles //附件表   ps：非驼峰
+    });
+  }
+  async listAction() {
+    await table.list({
+      ctx: this.ctx,
+      rules: [], //数据操作规则
+      dbTable, //表 *必传
+      keyId, //主键id     ps：非驼峰
+      dbTableFiles, //附件表   ps：非驼峰
+      filesField
+      //以下全部为驼峰
+      // relationTable, //incBook 关系表
+      // relationTableKey, //从表关联主表的主键
+      // relationTableChildren, // 关系表主键 ps：驼峰
+      // relationTableChildrenFilesTableName,
+      // relationTableChildrenFilesKey,
+      // relationTableChildrenFilesField,
+      // relationTableChildrenFilesFieldId
+    });
+  }
+
   async updateAction() {
-    try {
-      const params = await think.newParams(this.ctx, update);
-      if (params.success) {
-        delete params.success;
-
-        //有附件得更新所有附件附件
-        if (
-          dbTableFiles &&
-          params[filesField] &&
-          think.isArray(params[filesField]) &&
-          !think.isEmpty(params[filesField])
-        ) {
-          const modelf = think.model(dbTableFiles);
-          params[filesField] = params[filesField].map(item => {
-            //设置主键
-            item[keyId] = params[keyId];
-            return item;
-          });
-          //先删后增
-          await modelf.where({ [keyId]: params[keyId] }).delete();
-          await modelf.addMany(params[filesField]);
-        }
-
-        const model = think.model(dbTable);
-        const data = await model.where({ uid: params.uid }).update({
-          ...params
-        });
-        this.ctx.body = think.updateRes(data);
-      }
-    } catch (err) {
-      think.sysErr(err, this.ctx);
-    }
+    await table.update({
+      ctx: this.ctx,
+      rules: update, //数据操作规则
+      dbTable, //表 *必传
+      keyId, //主键id     ps：非驼峰
+      filesField,
+      dbTableFiles: dbTableFiles //附件表   ps：非驼峰
+    });
   }
   __call() {
     //如果相应的Action不存在则调用该方法

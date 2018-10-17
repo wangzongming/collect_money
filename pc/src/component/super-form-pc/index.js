@@ -1,330 +1,203 @@
-import React, { Component } from "react";
-import { Form, Spin, Upload, Icon, Button, Modal } from "antd";
-import s from "./style.less";
-import inpus from "./components/inpus";
-import initialValueSwitch from "./methods/initialSwitch";
-import _typeSwitch from "./methods/typeSwitch";
-import { withRouter } from "react-router-dom";
-import {
-  setFormValues,
-  getSelectOptData,
-  getValues,
-  btnClick
-} from "./methods";
-// import { withRouter } from 'react-router-dom';
+
+import React, { PureComponent } from 'react'
+import { Form, Input, Button, message, message as Msg, Row, Col } from 'antd';
+import { withRouter } from 'react-router-dom';
+import { createInput, filterObjAttr, getDeviceType, getParams } from './tool';
+import { myFetch, getValues, setValues, sFormatData, submit, confirm, help, wran, setSelectOptionData } from './method';
+import s from './style.less';
+
 const FormItem = Form.Item;
-const formItemLayout = {
-  labelCol: {
-    xs: { span: 24 },
-    sm: { span: 4 }
-  },
-  wrapperCol: {
-    xs: { span: 24 },
-    sm: { span: 16 }
-  }
-};
+const version = window.QnnForm_version = 'test';
 
 const tailFormItemLayout = {
-  wrapperCol: {
-    xs: {
-      span: 24,
-      offset: 0
+    wrapperCol: {
+        xs: {
+            span: 24,
+            offset: 0,
+        },
+        sm: {
+            span: 16,
+            offset: 5,
+        }
     },
-    sm: {
-      span: 13,
-      offset: 4
-    }
-  }
 };
 
-class Index extends Component {
-  constructor(...args) {
-    super(...args);
-    this.state = {
-      loading: true,
-      value: {} //所有字段的值
-    };
-  }
-
-  componentDidMount() {
-    // console.log(this)
-    console.assert(this.props.myFetch, "SuperFotm的myFetch为必传！！！");
-    console.assert(this.props.config, "SuperFotm的config为必传！！！");
-    const { config = {} } = this.props;
-    const {
-      dev = false,
-      formConfig = [],
-      fetchConfig = {},
-      btns = []
-    } = config;
-    console.assert(formConfig, "config的formConfig为必传！！！");
-    this.setState({
-      dev,
-      formConfig,
-      fetchConfig,
-      btns
-    });
-    if (dev) {
-      console.log("表单配置:", config);
-    }
-
-    //遍历数据请求下拉选项的值或者获取人或者部门的树结构
-    for (let i = 0; i < formConfig.length; i++) {
-      const { type, fetchConfig = {}, field, isUrlParam } = formConfig[i];
-      if (type === "select" && fetchConfig.apiName) {
-        let _data = getSelectOptData.bind(this)(fetchConfig);
-        if (_data) {
-          let { otherData } = this.state;
-          let _selectOptionDataKey = `${field}__selectOptionDataKey`;
-          otherData[_selectOptionDataKey] = _data;
-          this.setState({
-            otherData
-          });
+class index extends PureComponent {
+    static getDerivedStateFromProps(props, state) {
+        let obj = {
+            ...state,
+            ...props,
         }
-      }
-      if (isUrlParam) {
-        let _data = this.props.match.params[field];
-        let { value } = this.state;
-        if (_data) {
-          //   let _d = {};
-          value[field] = _data;
-          this.setState({
-            value
-          });
+        return obj;
+    }
+
+    static sFormatData(data, formConfig, type) {
+        return sFormatData(data, formConfig, type)
+    }
+
+    constructor(...args) {
+        super(...args);
+        help.bind(this)(version);
+        wran.bind(this)();
+
+        this.state = {
+            fetchConfig: this.props.fetchConfig || {},
+            formConfig: this.props.formConfig || [],
+            btns: []
         }
-      }
+
+        //按钮布局
+        this.tailFormItemLayout = this.props.tailFormItemLayout || tailFormItemLayout;
+
+        //外部传入的fetch方法返回必须是个promise
+        this.fetch = this.props.fetch;
+        this.headers = this.props.headers;
+
+        //给一些方法绑定this
+        this.createInput = createInput.bind(this);
+        this.myFetch = myFetch.bind(this);
+        this.getValues = getValues.bind(this);
+        this.submit = submit.bind(this);
+        this.confirm = confirm.bind(this);
+        this.filterObjAttr = filterObjAttr;
+        this.getDeviceType = getDeviceType;
+        this.getParams = getParams.bind(this);
+        this.setValues = setValues.bind(this);
+
+        //下选择的数据key名
+        this.selectKey = (field) => `${field}_optionData`;
+
+        //绑定给按钮点击后回调使用的方法
+        this.btnfns = {
+            getValues: this.getValues,
+            setValues: this.setValues, 
+            tableRefresh:this.props.refresh,//刷新方法
+            myFetch: this.myFetch,
+            Msg: message,
+            confirm: this.confirm,
+            formatData: sFormatData,
+            match: this.props.match,
+        }
     }
 
-    // setTimeout(() => {
-    //     this.setState({
-    //         loading: false
-    //     })
-    // }, 100)
-
-    //暴露出去的方法
-    this.getValues = getValues.bind(this);
-
-    //内部使用的方法
-    this.btnClick = btnClick.bind(this);
-
-    //按钮回调中的方法
-    this.btnObj = {
-      getValues: this.getValues,
-      form: this.props.form
-    };
-
-    //给表单赋默认值  一定要放到最后执行
-    if (fetchConfig.apiName) {
-      //需要去请求默认表单值
-      this.setState({
-        loading: true
-      });
-      setFormValues.bind(this)(fetchConfig);
-    } else {
-      this.setState({
-        loading: false
-      });
+    isMobile = () => this.getDeviceType() === 'mobile';
+    // isMobile = () => true;
+    isPc = () => this.getDeviceType() === 'pc';
+    
+    componentDidMount() {
+        const { fetchConfig } = this.state;
+        const { apiName, params, otherParams } = fetchConfig;
+        if (apiName) {
+            let _params = this.getParams(params, otherParams);
+            this.myFetch(apiName, _params, ({ success, data, message }) => {
+                if (success) {
+                    this.setValues(data)
+                } else {
+                    Msg.error(message)
+                }
+            });
+        } 
+        //设置所有的下拉选项
+        setSelectOptionData.bind(this)()
     }
-  }
 
-  handleSubmit = () => {
-    console.log("提交");
-  };
+    render() {
+        const { formConfig = [], btns = [] } = this.state;
+        const { getFieldValue, getFieldDecorator } = this.props.form;
+        return (
+            <div className={s.root}>
+                <Form>
+                    {
+                        <Row gutter={24}>
+                            {
+                                formConfig.map((item, index) => {
+                                    if (item.hide) {
+                                        let { isUrlParams, field, initialValue } = item;
+                                        if (isUrlParams) {
+                                            let _params = this.props.match.params[field]
+                                            initialValue = _params ? _params : initialValue;
+                                        }
+                                        return getFieldDecorator(item.field, {
+                                            initialValue: initialValue
+                                        })(<Input type="hidden" key={index} />);
+                                    } else {
+                                        return <Col key={index} span={item.span || '24'}>
+                                            {this.createInput(item, index)}
+                                        </Col>
+                                    }
+                                })
+                            }
+                        </Row>
+                    }
+                    {
+                        btns.length > 0 ? <Row gutter={24}>
+                            <FormItem {...this.tailFormItemLayout}>
+                                {
+                                    btns.map((item, index) => {
+                                        const { type, label, condition } = item;
+                                        //需要将item中的一些不需要的属性过滤掉然后直接传给Button属性
+                                        let delArr = ['isValidate', 'condition', 'onClick', 'fetchConfig', 'affirmTitle', 'affirmDesc', 'affirmYes', 'affirmNo'];
+                                        const _props = this.filterObjAttr(item, delArr, 'del');
+                                        let _defaultStyle = {
+                                            marginRight: '8px'
+                                        }
 
-  imghandleCancel = () => {
-    //图片预览关闭
-    this.setState({
-      imgPreviewVisible: false
-    });
-  };
-  normFile = e => {
-    if (Array.isArray(e)) {
-      return e;
+                                        //条件设置
+                                        if (condition) {
+                                            for (let i = 0; i < condition.length; i++) {
+                                                let { regex = {}, action } = condition[i];
+                                                let _pass = true;//是否满足条件
+                                                for (const key in regex) {
+                                                    if (regex.hasOwnProperty(key)) {
+                                                        const targetValue = regex[key];//给的值
+                                                        const fieldValue = getFieldValue(key);//获取的表单支
+                                                        if (targetValue !== fieldValue) {
+                                                            _pass = false;
+                                                        }
+                                                    }
+                                                }
+                                                if (_pass) {
+                                                    if ((typeof action) === 'function') {
+                                                        action()
+                                                    } else {
+                                                        switch (action) {
+                                                            case 'disabled':
+                                                                _props.disabled = true;
+                                                                break;
+                                                            case 'hide':
+                                                                _defaultStyle.display = 'none';
+                                                                break;
+                                                            case 'show':
+                                                                _defaultStyle.display = 'inline-block';
+                                                                break;
+                                                            default:
+                                                                console.log(`${action}动作无效`)
+                                                                break;
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+
+                                        return <Button
+                                            style={{ ..._defaultStyle }}
+                                            key={index}
+                                            onClick={() => { this.submit(item) }}
+                                            type={type}
+                                            {..._props}>
+                                            {label}
+                                        </Button>
+                                    })
+                                }
+                            </FormItem>
+                        </Row>
+                            : null
+                    }
+
+                </Form>
+            </div>
+        )
     }
-    let { fileList } = e;
-    fileList = fileList.map(item => {
-      if (item.response && item.response.success) {
-        item = item.response.data;
-      }
-      return item;
-    });
-    return e && fileList;
-  };
-
-  render() {
-    const {
-      formConfig = [],
-      value,
-      btns = [],
-      loading,
-      otherData = {},
-      imgPreviewVisible,
-      previewImage
-    } = this.state;
-    const { getFieldDecorator } = this.props.form;
-
-    return (
-      <div className={s.SuperFormPc}>
-        <Spin size="large" spinning={loading}>
-          <Form onSubmit={this.handleSubmit}>
-            {formConfig.map((item, index) => {
-              const {
-                type,
-                field,
-                label,
-                help,
-                other = {},
-                message,
-                must,
-                initialValue,
-                rcFormConfig,
-                isHide,
-                selectOptionData = [],
-                url,
-                token,
-                disabled,
-                maxNumber = 999,
-                name = "file"
-              } = item;
-
-              const { getFieldValue } = this.props.form;
-              //下拉选择的选项数据
-              let _selectOptionDataKey = `${field}__selectOptionDataKey`;
-              item.selectOptionData =
-                otherData[_selectOptionDataKey] || selectOptionData;
-              switch (type) {
-                case "images":
-                  return (
-                    <FormItem
-                      key={index}
-                      label={label}
-                      help={help}
-                      {...formItemLayout}
-                      {...other}
-                      style={{
-                        display: isHide ? "none" : "block",
-                        ...other.style
-                      }}
-                    >
-                      <Modal
-                        visible={imgPreviewVisible}
-                        footer={null}
-                        onCancel={this.imghandleCancel}
-                      >
-                        <img
-                          alt="img"
-                          style={{ width: "100%" }}
-                          src={previewImage}
-                        />
-                      </Modal>
-                      {getFieldDecorator(field, {
-                        initialValue:
-                          initialValue ||
-                          initialValueSwitch(type, value[field]),
-                        rules: [
-                          {
-                            type: _typeSwitch(type),
-                            message: message ? message : `${label}为${type}类型`
-                          },
-                          {
-                            required: must,
-                            message: message
-                              ? message
-                              : `${label}为${
-                                  type === "select" ? "必选" : "必填"
-                                }项`
-                          }
-                        ],
-                        valuePropName: "fileList",
-                        getValueFromEvent: this.normFile,
-                        ...rcFormConfig
-                      })(
-                        <Upload
-                          key={index}
-                          action={url}
-                          name={name}
-                          listType="picture-card"
-                          disabled={disabled}
-                          headers={{
-                            token
-                          }}
-                          onPreview={file => {
-                            this.setState({
-                              previewImage: file.url || file.thumbUrl,
-                              imgPreviewVisible: true
-                            });
-                          }}
-                        >
-                          {getFieldValue(field).length >= maxNumber ? null : (
-                            <div>
-                              <Icon type="plus" />
-                              <div className="ant-upload-text">上传</div>
-                            </div>
-                          )}
-                        </Upload>
-                      )}
-                    </FormItem>
-                  );
-                default:
-                  return (
-                    <FormItem
-                      key={index}
-                      label={label}
-                      help={help}
-                      {...formItemLayout}
-                      {...other}
-                      style={{
-                        display: isHide ? "none" : "block",
-                        ...other.style
-                      }}
-                    >
-                      {getFieldDecorator(field, {
-                        initialValue: initialValue
-                          ? initialValue
-                          : initialValueSwitch(type, value[field]),
-                        rules: [
-                          {
-                            type: _typeSwitch(type),
-                            message: message ? message : `${label}为${type}类型`
-                          },
-                          {
-                            required: must,
-                            message: message
-                              ? message
-                              : `${label}为${
-                                  type === "select" ? "必选" : "必填"
-                                }项`
-                          }
-                        ],
-                        ...rcFormConfig
-                      })(inpus.bind(this)(item))}
-                    </FormItem>
-                  );
-              }
-            })}
-            <FormItem {...tailFormItemLayout}>
-              {btns.map((item, index) => {
-                let { label, other } = item;
-                return (
-                  <Button
-                    onClick={() => {
-                      this.btnClick(item);
-                    }}
-                    style={{ marginRight: "8px" }}
-                    key={index}
-                    {...other}
-                  >
-                    {label}
-                  </Button>
-                );
-              })}
-            </FormItem>
-          </Form>
-        </Spin>
-      </div>
-    );
-  }
 }
-
-const WrappedRegistrationForm = Form.create()(withRouter(Index));
-export default WrappedRegistrationForm;
+// const rForm = Form.create()(index); 
+export default withRouter(index); 

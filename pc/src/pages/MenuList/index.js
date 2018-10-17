@@ -27,7 +27,7 @@ class index extends Component {
       // {
       //   name: "宫保鸡丁",
       //   price: 82.12,
-      //   menuId: "123456", //id
+      //   id: "123456", //id
       //   soldOut: 10, //售出份数
       //   img: "https://images.pexels.com/photos/838846/pexels-photo-838846.jpeg?auto=compress&cs=tinysrgb&h=350",
       //   classify: [
@@ -52,12 +52,12 @@ class index extends Component {
     };
   }
 
-  payCancel = ()=>{
+  payCancel = () => {
     this.setState({
-      stepVisible:false,
-      orderForm:{}
-    })
-  }
+      stepVisible: false,
+      orderForm: {}
+    });
+  };
 
   refresh = () => {
     const { myAxios } = this.props;
@@ -99,8 +99,8 @@ class index extends Component {
       let exist = false;
       let index = 0;
       for (let i = 0; i < selected.length; i++) {
-        let { menuId } = selected[i];
-        if (params.menuId === menuId) {
+        let { id } = selected[i];
+        if (params.id === id) {
           //存在需要删除
           exist = true;
           index = i;
@@ -119,10 +119,10 @@ class index extends Component {
   };
 
   //增加份数
-  add = menuId => {
+  add = id => {
     let { selected = [] } = this.state;
     selected = selected.map(item => {
-      if (item.menuId === menuId) {
+      if (item.id === id) {
         //份数加一个
         item.count++;
       }
@@ -134,10 +134,10 @@ class index extends Component {
   };
 
   //删除份数
-  minus = menuId => {
+  minus = id => {
     let { selected = [] } = this.state;
     selected = selected.map(item => {
-      if (item.menuId === menuId) {
+      if (item.id === id) {
         //份数减一个
         if (item.count > 0) {
           item.count--;
@@ -165,11 +165,11 @@ class index extends Component {
       apiName: "orderAdd",
       params: selected
     }).then(({ success, message, data }) => {
-      if (success) { 
+      if (success) {
         this.setState({
           orderForm: data,
           stepVisible: true,
-          visible:false
+          visible: false
         });
       } else {
         Msg.error(message);
@@ -205,7 +205,7 @@ class index extends Component {
   editMenuBtn = params => {
     //跳转编辑页面
     const { push } = this.props;
-    push(`/menu/edit/${params.menuId}`);
+    push(`/menu/edit/${params.id}`);
   };
 
   render() {
@@ -229,7 +229,7 @@ class index extends Component {
             <div className="noData">暂无数据</div>
           ) : (
             <div className={s.root}>
-              {//非编辑模式下进入编辑模式会有提醒
+              {/* {//非编辑模式下进入编辑模式会有提醒
               edit ? (
                 <a
                   onClick={this.editBtn}
@@ -249,7 +249,7 @@ class index extends Component {
                     {edit ? "退出编辑模式" : "进入编辑模式"}
                   </a>
                 </Popconfirm>
-              )}
+              )} */}
 
               {/* 菜单项 */}
               <Row gutter={24}>
@@ -258,7 +258,7 @@ class index extends Component {
                     {
                       name,
                       price,
-                      menuId, //id
+                      id, //id
                       soldOut, //售出份数
                       classifyName = "暂未分类",
                       img
@@ -270,7 +270,7 @@ class index extends Component {
                     let _count = 0; //选了多少份
                     //是否被选中
                     for (let i = 0; i < selected.length; i++) {
-                      if (selected[i].menuId === menuId) {
+                      if (selected[i].id === id) {
                         _s = true;
                         _count = selected[i].count;
                       }
@@ -287,7 +287,7 @@ class index extends Component {
                         key={index}
                         onClick={() => {
                           this.menuClick({
-                            menuId,
+                            id,
                             name,
                             price
                           });
@@ -334,7 +334,7 @@ class index extends Component {
                                     type="plus"
                                     onClick={e => {
                                       e.stopPropagation();
-                                      this.add(menuId);
+                                      this.add(id);
                                     }}
                                   />,
                                   <span className={s.count}>{_count}</span>,
@@ -342,7 +342,7 @@ class index extends Component {
                                     type="minus"
                                     onClick={e => {
                                       e.stopPropagation();
-                                      this.minus(menuId);
+                                      this.minus(id);
                                     }}
                                   />
                                 ]
@@ -480,7 +480,12 @@ class index extends Component {
             </div>
           )}
 
-          <Order {...this.props} visible={this.state.stepVisible} orderForm={this.state.orderForm} payCancel={this.payCancel}/>
+          <Order
+            {...this.props}
+            visible={this.state.stepVisible}
+            orderForm={this.state.orderForm}
+            payCancel={this.payCancel}
+          />
         </div>
       </Spin>
     );

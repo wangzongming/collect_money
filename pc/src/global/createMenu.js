@@ -33,7 +33,7 @@ class createMenu extends Component {
   defaultOpenKeys = [];
 
   onCollapse = collapsed => {
-    console.log(collapsed);
+    // console.log(collapsed);
     this.setState({
       collapsed: !collapsed
     });
@@ -110,7 +110,9 @@ class createMenu extends Component {
           <div className={s.loginContainer}>
             {icon ? <img className={s.logo} src={icon} alt="logo" /> : ""}
 
-            <span style={{ display: collapsed ? "none" : "" }}>{title}</span>
+            <span style={{ display: collapsed ? "none" : "" }}>
+              {title} &nbsp; {window.globalConfig.version}
+            </span>
           </div>
           <Menu
             theme="dark"

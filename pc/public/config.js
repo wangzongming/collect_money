@@ -1,7 +1,7 @@
 var globalConfig = {
   dev: false,
-  //   apiUrl: "https://mnetwork.xyz:8080/",
-  apiUrl: "https://mnetwork.xyz:8080/",
+    apiUrl: "https://mnetwork.xyz:8080/",
+  // apiUrl: "https://api.liningyuan.com/",
   name: "收银管理系统",
   apiNames: {
     login: "adminUser/login",
@@ -9,8 +9,8 @@ var globalConfig = {
     //菜单操作
     menuAdd: "menu/add",
     menuDel: "menu/del",
-    menuUpdate: "menu/update",
-    menuList: "menu/list",
+    menuUpdate: "menu/update", 
+    menuList:"menu/list",
 
     //会员操作
     userAdd: "user/add",
@@ -26,7 +26,7 @@ var globalConfig = {
 
     //订单操作
     orderAdd: "order/add",
-    menuPay: "order/pay",
+    orderPay: "order/pay",
     orderDel: "order/del",
     orderUpdate: "order/update",
     orderList: "order/list"

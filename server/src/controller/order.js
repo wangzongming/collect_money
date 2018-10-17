@@ -7,7 +7,7 @@ const Base = require("./base.js");
 //数据库配置
 const dbTable = "order"; //主表数据表名
 const dbTableFiles = ""; //附件表名
-const keyId = "order_id"; //主键id
+const keyId = "id"; //主键id
 const filesField = "files"; //上传的附件name
 
 module.exports = class extends Base {
@@ -23,18 +23,20 @@ module.exports = class extends Base {
   }
   async listAction() {
     try {
-      //用户信息 菜信息  
+      //用户信息 菜信息
       //附件表情况下查询时需要查附件表
       const params = await think.newParams(this.ctx);
-      let data = await think.select(dbTable, params, dbTableFiles, [
-        keyId,
-        keyId
-      ]);
+      let { data, totalNumber } = await think.select(
+        dbTable,
+        params,
+        dbTableFiles,
+        [keyId, keyId]
+      );
       this.ctx.body = {
         message: "查询成功",
         success: true,
         data: data,
-        totalNumber: data.length
+        totalNumber: totalNumber
       };
     } catch (err) {
       think.sysErr(err, this.ctx);
@@ -69,64 +71,67 @@ module.exports = class extends Base {
       if (!think.isEmpty(params) && think.isArray(params)) {
         //数据符合格式
         let create_user = this.ctx.state.username; //创建者
+        let uid = this.ctx.state.uid; //创建者
         var order_price = 0; //订单价格
         var price = 0; //实付价格
 
-        let _ww = []; //存入数据库的所有id 有重复的是个二维数组  存入格式 aaa,aaaa-bbb,bbb-cccc
+        let _allMenu = ""; //所有菜的id 存入数据库的所有id 有重复菜的是个二维数组 存入格式 id(菜的id)-count(份数) eg sdcsdcsdc42435-2
         let _w = [];
-        let _number = {}; //{menu_id:number}
+        let idAndNum = {}; //id对应着份数 {id:number};
+
+        const model = think.model("menu");
+
         params.map((item, i) => {
           //遍历时除了遍历菜的id外还得遍历菜的份数
-          let menuId = item.menuId;
-          let number = item.count;
-          _number[menuId] = number;
-          let _a = "";
-          for (let k = 0; k < number; k++) {
-            if (k === 0) {
-              _a += menuId;
-            } else {
-              _a += `,${menuId}`;
-            }
+          let id = item.id; //菜的id
+          let number = item.count; //菜的份数
+          idAndNum[id] = number;
+          let _id = `${id}-${number}`;
+          if (i === 0) {
+            _allMenu += _id;
+          } else {
+            _allMenu += "," + _id;
           }
-          _ww.push(_a);
-          _w.push(menuId);
+          _w.push(id);
           return item;
         });
-        _ww = _ww.join("-"); //存入库的订单id
-        const model = think.model("menu");
-        //所有被定的菜
-        let data = await model
-          .where({ menu_id: ["IN", _w.join(",")] })
-          .select();
-        //遍历每条订单id去查询数据  确保数据用的是数据库里的数据 然后确定份数
-        for (const key in _number) {
-          for (let j = 0; j < data.length; j++) {
-            if (data[j].menu_id === key) {
-              //将份数设置进去、计算总价
-              let _price = data[j].price;
-              data[j].number = _number[key];
-              order_price += _number[key] * _price;
-              price += _number[key] * _price;
-            }
-          }
+        let data = await model.where({ [keyId]: ["IN", _w] }).select(); //将所有菜都拿出来
+
+        //从数据库中读取出来的用户选择的数据
+        let _d = data.filter(item => {
+          return _w.includes(item.id);
+        });
+        //将菜的信息加上份数在返回到前台
+        data = data.map(item => {
+          item.number = idAndNum[item.id]; //份数
+          item.allPrice = idAndNum[item.id] * item.price; //当前菜的价格份数*菜价
+          return item;
+        });
+
+        //循环得到的数据进行总价计算
+        for (let i = 0; i < _d.length; i++) {
+          //订单价格和实付价格
+          let _price = _d[i].price; //价格
+          order_price += idAndNum[_d[i].id] * _price; //计算份数*价格
+          price += idAndNum[_d[i].id] * _price;
         }
 
         //放进数据库状态为暂存
         const model2 = think.model(dbTable);
         const id = think.createUid();
         const _data = await model2.add({
-          order_id: id,
-          order_create_user: create_user,
+          [keyId]: id,
+          order_create_user: uid,
+          order_create_time: new Date().getTime(),
           order_price,
           price,
-          menu_id: _ww,
-          order_status: "0",
-          awaitPay: true
+          menu_id: _allMenu,
+          order_status: "0"
         });
 
         this.ctx.body = {
           success: true,
-          message: "订单生产成功",
+          message: "订单生成完毕",
           data: {
             orderId: id,
             menuList: data, //菜列表
@@ -164,7 +169,7 @@ module.exports = class extends Base {
           wait_pay: waitPay,
           order_status: orderStatus,
           uid: uid,
-          pay_method: payMethod 
+          pay_method: payMethod
         });
 
         this.ctx.body = {

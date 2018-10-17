@@ -81,7 +81,7 @@ class order extends Component {
   };
   render() {
     const { visible, steps, payMethod, orderForm = {}, over } = this.state;
-    const { menuList = [], price = "0", receiver = "" } = orderForm;
+    const { menuList = [], price = "0" } = orderForm; //, receiver = ""
     return (
       <div>
         <Modal
@@ -99,7 +99,7 @@ class order extends Component {
           <br />
           <div
             style={{
-              maxHeight: "300px", 
+              maxHeight: "300px",
               display: over ? "" : "none",
               textAlign: "center"
             }}
@@ -107,9 +107,13 @@ class order extends Component {
             <Icon
               style={{ color: "#1890ff", fontSize: "100px" }}
               type="check-circle"
-            />  
-            <p style={{ fontSize: "20px", color: "orange",margin:'16px' }}>￥{price}</p>
-            <Button style={{ width: "130px"  }} onClick={this.props.payCancel}>关闭</Button>
+            />
+            <p style={{ fontSize: "20px", color: "orange", margin: "16px" }}>
+              ￥{price}
+            </p>
+            <Button style={{ width: "130px" }} onClick={this.props.payCancel}>
+              关闭
+            </Button>
           </div>
           <div
             style={{
@@ -173,7 +177,7 @@ class order extends Component {
               onClick={this.props.payCancel}
               style={{ marginRight: "8px" }}
             >
-              取消订单
+              暂不支付
             </Button>
             <Button type="primary" onClick={this.pay}>
               {payMethod === "0" ? "去支付" : "确认结账"}

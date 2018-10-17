@@ -6,7 +6,7 @@ import store from "storejs";
 import setUserInfo from "./setUserInfo";
 const { dev, apiUrl, apiNames } = window.globalConfig;
 
-const getApiName = apiName => { 
+const getApiName = apiName => {  
   if (apiNames[apiName]) {
     return `${apiUrl}${apiNames[apiName]}`;
   } else {

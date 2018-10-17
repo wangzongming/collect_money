@@ -1,6 +1,17 @@
 {
-  "name": "super-form-pc",
-  "version": "1.0.2",
+  "name": "qnn-table",
+  "version": "0.0.44",
+  "keywords": [
+    "react",
+    "super-table",
+    "antd",
+    "rc-form"
+  ],
+  "description": "<SuperTable\r         fetch={this.props.myFetch}\r         headers={{ token: this.props.loginAndLogoutInfo.loginInfo.token }}\r         {...window.tableConfig.testPage}\r     />",
   "main": "index.js",
-  "license": "MIT"
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "oldwang",
+  "license": "ISC"
 }

@@ -14,19 +14,14 @@ class SiderMenu extends React.Component {
     collapsed: false
   };
   componentDidMount() {
-    getUserInfo().then(
-      ({
-        avatar = "https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png",
-        name = "admin"
-      }) => {
-        this.setState({
-          userInfo: {
-            avatar,
-            name
-          }
-        });
-      }
-    );
+    getUserInfo().then(({ userInfo: { head_img, username = "未知" } }) => {
+      this.setState({
+        userInfo: {
+          avatar: head_img,
+          name: username
+        }
+      });
+    });
   }
   toggle = () => {
     this.setState({
