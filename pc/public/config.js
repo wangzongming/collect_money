@@ -1,7 +1,7 @@
 var globalConfig = {
   dev: false,
-    apiUrl: "https://mnetwork.xyz:8080/",
-  // apiUrl: "https://api.liningyuan.com/",
+    // apiUrl: "https://mnetwork.xyz:8080/",
+  apiUrl: "https://api.liningyuan.com/",
   name: "收银管理系统",
   apiNames: {
     login: "adminUser/login",
