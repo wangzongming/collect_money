@@ -3,6 +3,7 @@
 */
 
 import { add, update, del } from "../rules/order";
+import table from "../func/table";
 const Base = require("./base.js");
 //数据库配置
 const dbTable = "order"; //主表数据表名
@@ -22,52 +23,86 @@ module.exports = class extends Base {
     });
   }
   async listAction() {
-    try {
-      //用户信息 菜信息
-      //附件表情况下查询时需要查附件表
-      const params = await think.newParams(this.ctx);
-      let { data, totalNumber } = await think.select(
-        dbTable,
-        params,
-        dbTableFiles,
-        [keyId, keyId]
-      );
-      this.ctx.body = {
-        message: "查询成功",
-        success: true,
-        data: data,
-        totalNumber: totalNumber
-      };
-    } catch (err) {
-      think.sysErr(err, this.ctx);
-    }
+    await table.list({
+      ctx: this.ctx,
+      rules: [], //数据操作规则
+      dbTable, //表 *必传
+      keyId, //主键id     ps：非驼峰
+      dbTableFiles, //附件表   ps：非驼峰
+      filesField
+      //以下全部为驼峰
+      // relationTable, //incBook 关系表
+      // relationTableKey, //从表关联主表的主键
+      // relationTableChildren, // 关系表主键 ps：驼峰
+      // relationTableChildrenFilesTableName,
+      // relationTableChildrenFilesKey,
+      // relationTableChildrenFilesField,
+      // relationTableChildrenFilesFieldId
+    });
   }
   async delAction() {
-    try {
-      //附件表情况下删除时需要删除附件
-      const params = await think.newParams(this.ctx, del);
-      if (params.success) {
-        delete params.success;
-
-        if (dbTableFiles) {
-          //附件表存需要删除附件
-          const modelf = think.model(dbTableFiles);
-          const dataf = await modelf.where({ [keyId]: params[keyId] }).delete();
-        }
-
-        const model = think.model(dbTable);
-        const data = await model.where({ [keyId]: params[keyId] }).delete();
-        this.ctx.body = think.delRes(data);
-      }
-    } catch (err) {
-      think.sysErr(err, this.ctx);
-    }
+    await table.del({
+      ctx: this.ctx,
+      rules: del, //数据操作规则
+      dbTable, //表 *必传
+      keyId, //主键id     ps：非驼峰
+      filesField,
+      dbTableFiles: dbTableFiles //附件表   ps：非驼峰
+    });
   }
   async addAction() {
-    //新增订单  不是结账
     try {
-      // const params = await think.newParams(this.ctx, add);
+      //新增充值订单
       const params = await this.ctx.post();
+      const model2 = think.model(dbTable);
+      const modelbyUser = think.model("user");
+      if (!think.isEmpty(params) && think.isObject(params)) {
+        if (params.orderType === "1") {
+          if (!params.orderPrice || !params.uid) {
+            this.ctx.body = {
+              success: false,
+              message: "充值金额/用户不能为空！"
+            };
+          }
+          let _userInfo = await modelbyUser.where({ id: params.uid }).find();
+          if (think.isEmpty(_userInfo)) {
+            //用户未查询到处理
+            this.ctx.body = {
+              message: "未查询到该用户",
+              success: false
+            };
+            return;
+          } 
+ 
+          await modelbyUser.where({ id: params.uid }).increment('balance',params.orderPrice); 
+
+          await model2.add({
+            uid: params.uid,
+            [keyId]: think.createUid(),
+            order_create_user: this.ctx.state.uid,
+            order_create_time: new Date().getTime(),
+            order_pay_time:new Date().getTime(),
+            order_over_time:new Date().getTime(),
+            discounts_price:0,
+            order_price: params.orderPrice,
+            price: params.orderPrice,
+            order_type: "1",
+            order_status: "1"
+          });
+
+          this.ctx.body = {
+            success: true,
+            message: "充值成功", 
+          };
+        } else {
+          this.ctx.body = {
+            success: false,
+            message: "暂不支持当前订单类型"
+          };
+        }
+        return;
+      }
+      //新增订单  不是结账
       if (!think.isEmpty(params) && think.isArray(params)) {
         //数据符合格式
         let create_user = this.ctx.state.username; //创建者
@@ -78,7 +113,6 @@ module.exports = class extends Base {
         let _allMenu = ""; //所有菜的id 存入数据库的所有id 有重复菜的是个二维数组 存入格式 id(菜的id)-count(份数) eg sdcsdcsdc42435-2
         let _w = [];
         let idAndNum = {}; //id对应着份数 {id:number};
-
         const model = think.model("menu");
 
         params.map((item, i) => {
@@ -117,15 +151,14 @@ module.exports = class extends Base {
         }
 
         //放进数据库状态为暂存
-        const model2 = think.model(dbTable);
-        const id = think.createUid();
-        const _data = await model2.add({
-          [keyId]: id,
+        await model2.add({
+          [keyId]: think.createUid(),
           order_create_user: uid,
           order_create_time: new Date().getTime(),
           order_price,
           price,
-          menu_id: _allMenu,
+          menu_id: _allMenu, 
+          order_type: "0",
           order_status: "0"
         });
 
@@ -187,38 +220,14 @@ module.exports = class extends Base {
     }
   }
   async updateAction() {
-    try {
-      const params = await think.newParams(this.ctx, update);
-      if (params.success) {
-        delete params.success;
-
-        //有附件得更新所有附件附件
-        if (
-          dbTableFiles &&
-          params[filesField] &&
-          think.isArray(params[filesField]) &&
-          !think.isEmpty(params[filesField])
-        ) {
-          const modelf = think.model(dbTableFiles);
-          params[filesField] = params[filesField].map(item => {
-            //设置主键
-            item[keyId] = params[keyId];
-            return item;
-          });
-          //先删后增
-          await modelf.where({ [keyId]: params[keyId] }).delete();
-          await modelf.addMany(params[filesField]);
-        }
-
-        const model = think.model(dbTable);
-        const data = await model.where({ [keyId]: params[keyId] }).update({
-          ...params
-        });
-        this.ctx.body = think.updateRes(data);
-      }
-    } catch (err) {
-      think.sysErr(err, this.ctx);
-    }
+    await table.update({
+      ctx: this.ctx,
+      rules: update, //数据操作规则
+      dbTable, //表 *必传
+      keyId, //主键id     ps：非驼峰
+      filesField,
+      dbTableFiles: dbTableFiles //附件表   ps：非驼峰
+    });
   }
   __call() {
     //如果相应的Action不存在则调用该方法
